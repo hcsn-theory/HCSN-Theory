@@ -49,3 +49,56 @@ HCSN-Theory/
 ├── theory/                # Conceptual documentation
 │   └── hcsn_summary.md
 └── README.md
+
+# How to Run a Toy Universe
+## Requirements
+- Python ≥ 3.10
+- No external dependencies required (pure Python)
+## Basic Run
+Run the following command:
+python3 run_diagnostics.py
+This evolves a toy universe and prints diagnostics every N steps:
+- average coordination ⟨k⟩
+- causal depth (time)
+- interaction concentration
+- closure density
+- hierarchical stability
+## Diagnostics Explained
+| Quantity | Meaning |
+|---------|--------|
+| ⟨k⟩ | Average coordination (dimension control) |
+| L | Max causal chain length (emergent time) |
+| Φ | Interaction concentration (hub suppression) |
+| Ψ | Closure density (redundancy) |
+| Ω | Hierarchical closure (RG stability) |
+## Stable Spacetime-Like Behavior
+Stable spacetime-like behavior is empirically associated with:
+- ⟨k⟩ ≈ 7.5–8.5
+- Φ small
+- Ω non-zero across scales
+## Current Research Focus
+- Preventing metric collapse under coarse-graining
+- Implementing logarithmic information metrics
+- Enforcing holographic bounds dynamically
+- Identifying Lorentz-invariant fixed points
+- Exploring quantum probability emergence
+Negative results are considered valuable — they identify missing axioms.
+## Who Can Contribute?
+You don’t need to be an expert in quantum gravity.
+We welcome:
+- physicists (theory, GR, QFT, QG)
+- mathematicians (graph theory, category theory)
+- programmers (simulation, optimization, visualization)
+- curious thinkers
+If you can:
+- question assumptions
+- test ideas
+- improve code clarity
+You can contribute meaningfully.
+## Status
+🚧 Active Research
+This is not a finished theory.
+It is a controlled exploration of what minimal rules can generate a universe.
+## Philosophy
+> “The universe may not be described by computation — it may be computation.”
+HCSN treats this not as a metaphor, but as a testable hypothesis.
