@@ -49,8 +49,10 @@ HCSN-Theory/
 ├── theory/                # Conceptual documentation
 │   └── hcsn_summary.md
 └── README.md
+---
 
-# How to Run a Toy Universe
+---
+#How to Run a Toy Universe
 ## Requirements
 - Python ≥ 3.10
 - No external dependencies required (pure Python)
@@ -63,6 +65,10 @@ This evolves a toy universe and prints diagnostics every N steps:
 - interaction concentration
 - closure density
 - hierarchical stability
+
+---
+
+---
 ## Diagnostics Explained
 | Quantity | Meaning |
 |---------|--------|
@@ -71,6 +77,10 @@ This evolves a toy universe and prints diagnostics every N steps:
 | Φ | Interaction concentration (hub suppression) |
 | Ψ | Closure density (redundancy) |
 | Ω | Hierarchical closure (RG stability) |
+
+----
+
+----
 ## Stable Spacetime-Like Behavior
 Stable spacetime-like behavior is empirically associated with:
 - ⟨k⟩ ≈ 7.5–8.5
@@ -83,6 +93,10 @@ Stable spacetime-like behavior is empirically associated with:
 - Identifying Lorentz-invariant fixed points
 - Exploring quantum probability emergence
 Negative results are considered valuable — they identify missing axioms.
+
+---
+
+---
 ## Who Can Contribute?
 You don’t need to be an expert in quantum gravity.
 We welcome:
@@ -95,10 +109,16 @@ If you can:
 - test ideas
 - improve code clarity
 You can contribute meaningfully.
+
+---
+
+---
 ## Status
 🚧 Active Research
 This is not a finished theory.
 It is a controlled exploration of what minimal rules can generate a universe.
+
 ## Philosophy
 > “The universe may not be described by computation — it may be computation.”
 HCSN treats this not as a metaphor, but as a testable hypothesis.
+---
