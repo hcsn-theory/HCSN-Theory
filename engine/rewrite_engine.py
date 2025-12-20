@@ -43,23 +43,22 @@ class RewriteEngine:
             random.seed(seed)
 
     def step(self):
-        # --- Snapshot BEFORE rewrite ---
-        H_before = copy.copy(self.H)
+        # --- 0. Snapshot ---
+        H_snapshot = copy.deepcopy(self.H)
 
-        # Time structure before
+        # --- 1. Measure BEFORE ---
         L_before = self.H.max_chain_length()
-
-        # Extensivity before
+        
         inter_before = worldline_interaction_graph(self.H)
         phi_before = interaction_concentration(inter_before)
-
-        # Apply Closure
+        
         psi_before = closure_density(inter_before)
-
-        # Apply Hierarchical Closure
+        
         omega_before = hierarchical_closure(self.H, inter_before)
 
-        # --- Apply rewrite rule ---
+        k_before = self.H.average_coordination()
+
+        # --- 2. Propose rewrite ---
         if random.random() < self.p_create:
             success = edge_creation_rule(self.H)
         else:
@@ -69,7 +68,7 @@ class RewriteEngine:
             self.time += 1
             return False
 
-        # --- Measure AFTER rewrite ---
+        # --- 3. Measure AFTER ---
         L_after = self.H.max_chain_length()
         delta_L = L_after - L_before
 
@@ -83,38 +82,41 @@ class RewriteEngine:
         omega_after = hierarchical_closure(self.H, inter_after)
         delta_omega = omega_after - omega_before
 
-        # --- Acceptance probability ---
+        k_after = self.H.average_coordination()
+
+        # --- 4. Acceptance probability ---
         accept_prob = 1.0
 
-        # Time inertia: penalize loss of causal depth
+        # Time inertia
         if delta_L < 0:
             accept_prob *= math.exp(self.gamma_time * delta_L)
 
-        # Spatial locality inertia (if you already had it)
-        # NOTE: leave this part unchanged if it already exists
-        # accept_prob *= spatial_factor
-
-        # Extensivity axiom: suppress hub growth
+        # Extensivity (hub suppression)
         if delta_phi > 0:
             accept_prob *= math.exp(-self.gamma_ext * delta_phi)
 
-        # Closure axiom: REWARD loops (redundancy)
+        # Closure (redundancy reward)
         if delta_psi > 0:
             accept_prob *= math.exp(self.gamma_closure * delta_psi)
 
-        # Hierarchical Closure Acceptance Rule
+        # Hierarchical stability
         if delta_omega > 0:
             accept_prob *= math.exp(self.gamma_hier * delta_omega)
 
-        # --- Accept or reject ---
+        # --- 5. Geometricity constraint (THIS is what you add) ---
+        k_target = 8.0
+        accept_prob *= math.exp(-0.1 * (k_after - k_target)**2)
+
+        # --- 6. Accept or reject ---
         if random.random() > accept_prob:
-           # Reject rewrite (do nothing, state already mutated minimally)
-           self.time += 1
-           return False
+            self.H = H_snapshot  # undo rewrite
+            self.time += 1
+            return False
 
         self.time += 1
         return True
-
+    
     def run(self, steps):
         for _ in range(steps):
             self.step()
+            

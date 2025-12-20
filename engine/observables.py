@@ -246,13 +246,14 @@ def loop_mismatch_weights(interactions, depths, beta=0.05):
                     du, dv, dw = degrees[u], degrees[v], degrees[w]
                     base = abs((du + dv + dw) - 3 * avg_d)
 
-                    depths = [
-                        depths[u],
-                        depths[v],
-                        depths[w]
-                    ]
-                    mean_t = sum(depths) / 3
-                    var_t = sum((t - mean_t)**2 for t in depths) / 3
+                    tu = depths.get(u, 0.0)
+                    tv = depths.get(v, 0.0)
+                    tw = depths.get(w, 0.0)
+
+                    mean_t = (tu + tv + tw) / 3
+                    var_t = ((tu - mean_t)**2 +
+                             (tv - mean_t)**2 +
+                             (tw - mean_t)**2) / 3
 
                     theta = base * (1 + beta * var_t)
                     weights.append(theta)
@@ -268,7 +269,8 @@ def emergent_distance_scale(interactions, depths, beta=0.05):
         return 0.0
     return sum(weights) / len(weights)
 
-def renormalized_distance_scales(H, interactions, depths, beta=0.05, scales=(2, 4, 8, 16)):
+def renormalized_distance_scales(H, interactions, depths,
+                                 beta=0.05, scales=(2, 4, 8, 16)):
     """
     Compute protected emergent distance scale under coarse-graining.
     """
@@ -277,9 +279,14 @@ def renormalized_distance_scales(H, interactions, depths, beta=0.05, scales=(2, 
     current_depths = depths
 
     for s in scales:
-        coarse_inter, coarse_depths = coarse_grain_interactions(H, current_inter, scale=s)
-        results[s] = emergent_distance_scale(coarse_inter, coarse_depths, H, beta)
+        coarse_inter, coarse_depths = coarse_grain_interactions(
+            H, current_inter, scale=s
+        )
+        results[s] = emergent_distance_scale(
+            coarse_inter, coarse_depths, beta
+        )
         current_inter = coarse_inter
         current_depths = coarse_depths
 
     return results
+    
