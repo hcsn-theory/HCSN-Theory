@@ -53,8 +53,8 @@ HCSN-Theory/
 ---
 # How to Run a Toy Universe
 ## Requirements
-- Python ≥ 3.10
-- No external dependencies required (pure Python)
+* Python ≥ 3.10
+* No external dependencies required (pure Python)
 ## Basic Run
 Run the following command:
 python3 run_diagnostics.py
