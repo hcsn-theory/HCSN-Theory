@@ -49,7 +49,7 @@ HCSN-Theory/
 ├── theory/                # Conceptual documentation
 │   └── hcsn_summary.md
 └── README.md
-'''
+```
 
 ---
 #How to Run a Toy Universe
