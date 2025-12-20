@@ -87,7 +87,7 @@ Clone and run:
 ```bash
 git clone https://github.com/hcsn-theory/HCSN-Theory.git
 cd HCSN-Theory
-python3 run_diagnostics.py
+python3 run_simulation.py
 ```
 
 This runs a toy universe and prints diagnostics every N steps (see config/flags in the engine if present).
