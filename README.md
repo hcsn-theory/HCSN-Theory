@@ -50,9 +50,8 @@ HCSN-Theory/
 │   └── hcsn_summary.md
 └── README.md
 ```
-
 ---
-#How to Run a Toy Universe
+# How to Run a Toy Universe
 ## Requirements
 - Python ≥ 3.10
 - No external dependencies required (pure Python)
