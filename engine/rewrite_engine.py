@@ -43,9 +43,7 @@ class RewriteEngine:
             random.seed(seed)
 
     def step(self):
-        # --- 0. Snapshot ---
-        H_snapshot = copy.deepcopy(self.H)
-
+        
         # --- 1. Measure BEFORE ---
         L_before = self.H.max_chain_length()
         
@@ -60,11 +58,11 @@ class RewriteEngine:
 
         # --- 2. Propose rewrite ---
         if random.random() < self.p_create:
-            success = edge_creation_rule(self.H)
+            undo = edge_creation_rule(self.H)
         else:
-            success = vertex_fusion_rule(self.H)
+            undo = vertex_fusion_rule(self.H)
 
-        if not success:
+        if undo is None:
             self.time += 1
             return False
 
@@ -109,13 +107,39 @@ class RewriteEngine:
 
         # --- 6. Accept or reject ---
         if random.random() > accept_prob:
-            self.H = H_snapshot  # undo rewrite
+            self.undo_changes(undo)  # undo rewrite
             self.time += 1
             return False
 
         self.time += 1
         return True
-    
+            
+    def undo_changes(self, undo):
+        
+        # restore removed vertex
+        if "removed_vertex" in undo:
+        
+            v = undo["removed_vertex"]
+            self.H.vertices[v.id] = v
+            self.H.causal_order[v.id] = set()
+
+        # restore removed edges
+        for eid, e in undo.get("removed_edges", {}).items():
+            self.H.hyperedges[eid] = e
+
+        # remove added edges
+        for eid in undo.get("added_edges", []):
+            self.H.hyperedges.pop(eid, None)
+
+        # remove added vertices
+        for vid in undo.get("added_vertices", []):
+            self.H.vertices.pop(vid, None)
+            self.H.causal_order.pop(vid, None)
+
+        # restore causal relations
+        for u, past in undo.get("old_causal", {}).items():
+            self.H.causal_order[u] = past
+            
     def run(self, steps):
         for _ in range(steps):
             self.step()

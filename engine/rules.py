@@ -4,74 +4,87 @@ import random
 
 
 def edge_creation_rule(H):
-    """
-    Edge creation:
-    •—•  →  •—•—•
-    Includes causal thickening.
-    """
-
+    
     if not H.hyperedges:
-        return False
+        return None
+
+    undo = {
+        "added_vertices": [],
+        "added_edges": [],
+        "added_causal": []
+    }
 
     edge = random.choice(list(H.hyperedges.values()))
     new_vertex = H.add_vertex()
+    undo["added_vertices"].append(new_vertex.id)
 
     # connect causally to vertices in the chosen edge
     for v in edge.vertices:
         H.add_causal_relation(v, new_vertex)
+        undo["added_causal"].append((v.id, new_vertex.id))
 
-    # causal thickening: inherit some causal past
+    # causal thickening
     for v in edge.vertices:
         for u in H.causal_past(v):
             if random.random() < 0.3:
                 H.add_causal_relation(u, new_vertex)
+                undo["added_causal"].append((u.id, new_vertex.id))
 
-    # create new hyperedge with extension
-    H.add_hyperedge(list(edge.vertices) + [new_vertex])
+    # create new hyperedge
+    e = H.add_hyperedge(list(edge.vertices) + [new_vertex])
+    undo["added_edges"].append(e.id)
 
-    return True
+    return undo
 
 
 def vertex_fusion_rule(H):
-    """
-    Vertex fusion:
-    •—•—• → •═•
-    Only allowed if hypergraph remains non-degenerate.
-    """
-
+    
     if len(H.vertices) < 3 or len(H.hyperedges) < 1:
-        return False
+        return None
 
     edge = random.choice(list(H.hyperedges.values()))
-
+    
     if len(edge.vertices) < 3:
-        return False
+        return None
 
     v_keep = edge.vertices[0]
     v_remove = edge.vertices[1]
+    
 
-    # Check if removing v_remove would destroy all hyperedges
     remaining_edges = [
         e for e in H.hyperedges.values()
         if v_remove not in e.vertices
     ]
-
+    
     if not remaining_edges:
-        return False
+        return None
 
-    # Redirect causal relations
-    for u in list(H.vertices.values()):
+    undo = {
+        "removed_vertex": v_remove,
+        "removed_edges": {},
+        "old_causal": {}
+    }
+
+    # log causal relations
+    for u in H.vertices.values():
+        if v_remove.id in H.causal_order[u.id]:
+            undo["old_causal"][u.id] = set(H.causal_order[u.id])
+
+    # redirect causal relations
+    for u in H.vertices.values():
         if v_remove.id in H.causal_order[u.id]:
             H.causal_order[u.id].add(v_keep.id)
             H.causal_order[u.id].discard(v_remove.id)
 
-    # Remove vertex
+    # remove edges containing v_remove
+    for eid in list(H.hyperedges.keys()):
+        e = H.hyperedges[eid]
+        if v_remove in e.vertices:
+            undo["removed_edges"][eid] = e
+            del H.hyperedges[eid]
+
+    # remove vertex
     del H.vertices[v_remove.id]
     del H.causal_order[v_remove.id]
 
-    # Remove edges containing removed vertex
-    for eid in list(H.hyperedges.keys()):
-        if v_remove in H.hyperedges[eid].vertices:
-            del H.hyperedges[eid]
-
-    return True
+    return undo
